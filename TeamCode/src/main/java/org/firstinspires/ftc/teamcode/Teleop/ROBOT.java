@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -28,6 +29,16 @@ public class ROBOT extends OpMode {
     double rotation = 0;
     public static double wheelsPower = 1;
 
+    private DcMotor mER;
+    private DcMotor mEL;
+    private Servo sSO;  // intake arm
+    private Servo sCR;  // rotation servo
+    private Servo sCL;  // additional servo left
+    private Servo sC;   // additional servo center
+    private Servo sHL;  // additional servo left handle
+    private Servo sHR;  // additional servo right handle
+
+
 
 
     @Override
@@ -46,9 +57,38 @@ public class ROBOT extends OpMode {
         motorRightFront.setDirection(DcMotor.Direction.REVERSE); //  BL  BR
         motorRightBack.setDirection(DcMotor.Direction.FORWARD);  //
 
+        mEL = hardwareMap.get(DcMotor.class, "liftMotor1");
+        mER = hardwareMap.get(DcMotor.class, "liftMotor2");
+
+        sSO = hardwareMap.get(Servo.class, "sSO");
+        sCR = hardwareMap.get(Servo.class, "sCR");
+        sCL = hardwareMap.get(Servo.class, "sCL");
+        sC = hardwareMap.get(Servo.class, "sC");
+        sHL = hardwareMap.get(Servo.class, "sHL");
+        sHR = hardwareMap.get(Servo.class, "sHR");
+
+        sSO = hardwareMap.get(Servo.class, "sSO");
+        sCR = hardwareMap.get(Servo.class, "sCR");
+        sCL = hardwareMap.get(Servo.class, "sCL");
+        sC = hardwareMap.get(Servo.class, "sC");
+        sHL = hardwareMap.get(Servo.class, "sHL");
+        sHR = hardwareMap.get(Servo.class, "sHR");
+
+        mEL = hardwareMap.get(DcMotor.class, "liftMotor1");
+        mER = hardwareMap.get(DcMotor.class, "liftMotor2");
+
+        mEL.setDirection(DcMotor.Direction.REVERSE);
+        mER.setDirection(DcMotor.Direction.FORWARD);
+
+        mEL.setDirection(DcMotor.Direction.REVERSE);
+        mER.setDirection(DcMotor.Direction.FORWARD);
+
+
+
     }
     @Override
     public void init_loop(){
+
 
     }
     @Override
@@ -97,7 +137,8 @@ public class ROBOT extends OpMode {
         motorLeftBack.setPower( (speed+turn-rotation) * wheelsPower );
         motorRightBack.setPower( (speed-turn+rotation) * wheelsPower );
 
-
+        controlLift();
+        controlServos();
 
 
         telemetry.update();
@@ -107,4 +148,64 @@ public class ROBOT extends OpMode {
     public void stop(){
 
     }
+    public void controlLift() {
+        // up
+        if (gamepad1.dpad_up) {
+            mER.setPower(1.0);
+            mEL.setPower(1.0);
+        }
+        // down
+        else if (gamepad1.dpad_down) {
+            mER.setPower(-1.0);
+            mEL.setPower(-1.0);
+        } else {
+            mER.setPower(0);
+            mEL.setPower(0);
+        }
+    }
+
+    public void controlServos() {
+
+        if (gamepad1.a) {
+            sSO.setPosition(0.5);  // open
+        } else if (gamepad1.b) {
+            sSO.setPosition(1.0);  // close
+        }
+
+
+        if (gamepad1.x) {
+            sCR.setPosition(0.5);  // rotation to one side
+        } else if (gamepad1.y) {
+            sCR.setPosition(1.0);  // rotation to another side
+        }
+
+
+        if (gamepad1.left_trigger > 0.5) {
+            sCL.setPosition(0.5);  // move to mid position
+        } else if (gamepad1.right_trigger > 0.5) {
+            sCL.setPosition(1.0);  // move to full position
+        }
+
+
+        if (gamepad1.dpad_left) {
+            sC.setPosition(0.5);  // move to mid position
+        } else if (gamepad1.dpad_right) {
+            sC.setPosition(1.0);  // move to full position
+        }
+
+
+        if (gamepad1.start) {
+            sHL.setPosition(0.5);  // move to mid position
+        } else if (gamepad1.back) {
+            sHL.setPosition(1.0);  // move to full position
+        }
+
+
+        if (gamepad1.left_stick_button) {
+            sHR.setPosition(0.5);  // move to mid position
+        } else if (gamepad1.right_stick_button) {
+            sHR.setPosition(1.0);  // move to full position
+        }
+    }
+
 }
